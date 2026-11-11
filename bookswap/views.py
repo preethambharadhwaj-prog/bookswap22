@@ -20,7 +20,8 @@ def signup(request):
     return render(request, "registration/signup.html", {"form": form})
 
 
-FILTERS = ("level", "department", "year", "semester", "course_code", "edition", "condition")
+EXACT = ("level", "department", "year", "semester", "condition")
+TEXT = ("course_code", "edition")
 
 
 def listing_list(request):
@@ -32,7 +33,10 @@ def listing_list(request):
     qs = Listing.objects.filter(is_available=True).select_related("owner__profile")
     if g.get("q"):
         qs = qs.filter(Q(title__icontains=g["q"]) | Q(description__icontains=g["q"]))
-    for f in FILTERS:
+    for f in EXACT:
+        if g.get(f):
+            qs = qs.filter(**{f: g[f]})
+    for f in TEXT:
         if g.get(f):
             qs = qs.filter(**{f"{f}__iexact": g[f]})
     return render(request, "bookswap/listing_list.html", {
