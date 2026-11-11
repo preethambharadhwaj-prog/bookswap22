@@ -1,0 +1,28 @@
+{% extends "bookswap/base.html" %}
+{% block content %}
+<p><a href="{% url 'listing_create' %}"><b>Passing out or moving up? Donate your books &amp; notes →</b></a></p>
+<form method="get">
+  <input name="q" placeholder="Search" value="{{ g.q }}">
+  <select name="level"><option value="">Any level</option>
+    {% for v, l in levels %}<option value="{{ v }}" {% if g.level == v %}selected{% endif %}>{{ l }}</option>{% endfor %}</select>
+  <select name="department"><option value="">Any department</option>
+    {% for v, l in departments %}<option value="{{ v }}" {% if g.department == v %}selected{% endif %}>{{ l }}</option>{% endfor %}</select>
+  <select name="year"><option value="">Any year</option>
+    {% for v, l in years %}<option value="{{ v }}" {% if g.year|stringformat:"s" == v|stringformat:"s" %}selected{% endif %}>{{ l }}</option>{% endfor %}</select>
+  <select name="semester"><option value="">Any sem</option>
+    {% for v, l in semesters %}<option value="{{ v }}" {% if g.semester|stringformat:"s" == v|stringformat:"s" %}selected{% endif %}>{{ l }}</option>{% endfor %}</select>
+  <input name="course_code" placeholder="Course code" value="{{ g.course_code }}">
+  <input name="edition" placeholder="Edition" value="{{ g.edition }}">
+  <select name="condition"><option value="">Any condition</option>
+    {% for v, l in conditions %}<option value="{{ v }}" {% if g.condition == v %}selected{% endif %}>{{ l }}</option>{% endfor %}</select>
+  <button>Filter</button>
+</form>
+{% for l in listings %}
+  <div class="card">
+    <a href="{% url 'listing_detail' l.pk %}"><b>{{ l.title }}</b></a>
+    · {{ l.course_code }} · {{ l.get_level_display }} Y{{ l.year }} S{{ l.semester }} · {{ l.get_offer_display }} · {{ l.get_condition_display }}<br>
+    by <a href="{% url 'profile' l.owner.username %}">{{ l.owner.username }}</a>
+    {% if l.owner.profile.avg_rating %}★ {{ l.owner.profile.avg_rating|floatformat:1 }}{% endif %}
+  </div>
+{% empty %}<p>No listings match.</p>{% endfor %}
+{% endblock %}

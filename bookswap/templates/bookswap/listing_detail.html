@@ -1,0 +1,20 @@
+{% extends "bookswap/base.html" %}
+{% block content %}
+<div class="card">
+  <h2 style="margin-top:0">{{ listing.title }}</h2>
+  <p><small>{{ listing.get_offer_display }} · {{ listing.get_level_display }} · {{ listing.get_department_display }} · Year {{ listing.year }}, Sem {{ listing.semester }}</small></p>
+  <p><small>{{ listing.course_code }} · Ed. {{ listing.edition|default:"–" }} · {{ listing.get_condition_display }}</small></p>
+  {% if listing.description %}<p>{{ listing.description }}</p>{% endif %}
+  <p>Owner: <a href="{% url 'profile' listing.owner.username %}">{{ listing.owner.username }}</a>
+    {% if listing.owner.profile.avg_rating %}★ {{ listing.owner.profile.avg_rating|floatformat:1 }}{% endif %}</p>
+</div>
+
+{% if form and listing.owner != user and listing.is_available %}
+  <h3>{% if listing.offer == 'donate' %}Claim this{% else %}Send a request{% endif %}</h3>
+  <form method="post" action="{% url 'request_create' listing.pk %}">{% csrf_token %}{{ form.as_p }}<button>Send</button></form>
+{% elif not user.is_authenticated %}
+  <p><a href="{% url 'login' %}">Log in</a> to request this.</p>
+{% elif not listing.is_available %}
+  <p><small>This item has already been claimed.</small></p>
+{% endif %}
+{% endblock %}

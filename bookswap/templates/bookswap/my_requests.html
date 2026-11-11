@@ -1,0 +1,21 @@
+{% extends "bookswap/base.html" %}
+{% block content %}
+<h2>Incoming</h2>
+{% for r in incoming %}
+  <div class="card">{{ r.requester.username }} wants to {{ r.get_kind_display|lower }} <b>{{ r.listing.title }}</b>
+    {% if r.offered %}(offers {{ r.offered.title }}){% endif %} — {{ r.get_status_display }}<br>{{ r.message }}<br>
+    {% if r.status == "pending" %}
+      <form method="post" action="{% url 'request_update' r.pk 'accept' %}" style="display:inline">{% csrf_token %}<button>Accept</button></form>
+      <form method="post" action="{% url 'request_update' r.pk 'decline' %}" style="display:inline">{% csrf_token %}<button>Decline</button></form>
+    {% elif r.status == "accepted" %}
+      <form method="post" action="{% url 'request_update' r.pk 'done' %}">{% csrf_token %}<button>Mark completed</button></form>
+    {% elif r.status == "done" %}<a href="{% url 'rate' r.pk %}">Rate {{ r.requester.username }}</a>{% endif %}
+  </div>
+{% empty %}<p>None.</p>{% endfor %}
+
+<h2>Sent</h2>
+{% for r in outgoing %}
+  <div class="card">{{ r.listing.title }} ({{ r.get_kind_display }}) — {{ r.get_status_display }}
+    {% if r.status == "done" %}· <a href="{% url 'rate' r.pk %}">Rate {{ r.owner.username }}</a>{% endif %}</div>
+{% empty %}<p>None.</p>{% endfor %}
+{% endblock %}

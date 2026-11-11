@@ -1,0 +1,11 @@
+{% extends "bookswap/base.html" %}
+{% block content %}
+<h2>{{ u.username }}</h2>
+<p>{{ prof.get_level_display }} · {{ prof.department }}{% if prof.is_alumni %} · Alumni{% endif %} {% if prof.year %}· Year {{ prof.year }}{% endif %}
+  {% if prof.avg_rating %}· ★ {{ prof.avg_rating|floatformat:1 }}{% endif %}</p>
+{% if u == user %}<p><a href="{% url 'profile_edit' %}">Edit profile</a></p>{% endif %}
+<h3>Listings</h3>
+{% for l in listings %}<div class="card"><a href="{% url 'listing_detail' l.pk %}">{{ l.title }}</a> · {{ l.course_code }}</div>{% empty %}<p>None.</p>{% endfor %}
+<h3>Feedback</h3>
+{% for r in ratings %}<div class="card">{{ r.score }}/5 — {{ r.comment }} <small>by {{ r.rater.username }}</small></div>{% empty %}<p>No ratings yet.</p>{% endfor %}
+{% endblock %}
